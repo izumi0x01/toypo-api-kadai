@@ -1,0 +1,20 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:11
+    expose:
+        - "5432"
+    volumes:
+      - ./tmp/db:/var/lib/postgresql/data
+    environment:
+      - "POSTGRES_USER=user" # 追記
+      - "POSTGRES_PASSWORD=pass" # 追記
+  web:
+    build: .
+    command: bash -c "rm -f /toypo-api-kadai-app-latest/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    volumes:
+      - .:/toypo-api-kadai-app-latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db

@@ -17,7 +17,7 @@ module Api
       def log_in
         @store = Store.find_by(email: params[:email])
 
-        if autheniticate(params[:password])
+        if Api::V1::Autheniticator.new(@store).autheniticate(params[:password])
           session[:store_id] = @store.id
           render json: @store
         else
@@ -63,12 +63,6 @@ module Api
         if session[:store_id]
           @current_store ||= Store.find_by(id: session[:store_id])
         end
-      end
-
-      private def autheniticate(raw_password)
-        #storeインスタンスが設定されており、パスワードが有効で、パスワードが正し時にTrueを返す
-        @store && @store.hashed_password &&  BCrypt::Password.new(@store.hashed_password) == raw_password
-
       end
 
     end

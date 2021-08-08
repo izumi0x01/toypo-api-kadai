@@ -1,10 +1,6 @@
 module Api
   module V1
-    class StoresController < ApplicationController
-      include ActionController::HttpAuthentication::Token::ControllerMethods
-
-      # before_action :authenticate
-      # skip_before_action :authenticate, only: [ :create, :log_in, :me]
+    class StoresController < ActionController::API
 
       def create
         @store = Store.create(store_name: params[:store_name], store_description: params[:store_description],email: params[:email], password: params[:password]);

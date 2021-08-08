@@ -10,9 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 0) do
+ActiveRecord::Schema.define(version: 2021_08_05_053130) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "stores", force: :cascade do |t|
+    t.string "store_name", null: false
+    t.string "store_description"
+    t.string "email", null: false
+    t.string "hashed_password"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index "lower((email)::text)", name: "index_stores_on_LOWER_email", unique: true
+  end
 
 end

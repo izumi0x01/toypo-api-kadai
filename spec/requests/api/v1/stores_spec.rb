@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+# 
 RSpec.describe Api::V1::Autheniticator do
   describe "#authenticator" do
     it "正しいパスワードならT" do
@@ -25,11 +26,15 @@ RSpec.describe Api::V1::Autheniticator do
 
 end
 
+# Storeのモデルのテスト
 RSpec.describe Store, type: :model do
   before do 
     @store = FactoryBot.build(:store)
   end
 
+  describe `POST /store/create`
+
+  
   describe 'バリデーション' do
     it '全てのパラメータに値が設定されていればT' do
       expect(@store.valid?).to be_truthy

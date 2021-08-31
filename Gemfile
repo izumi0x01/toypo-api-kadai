@@ -10,7 +10,11 @@ gem 'pg', '>= 0.18', '< 2.0'
 # Use Puma as the app server
 gem 'puma', '~> 3.11'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
+<<<<<<< HEAD
 gem 'jbuilder', '~> 2.5'
+=======
+ gem 'jbuilder', '~> 2.5'
+>>>>>>> 89f200087f6181daae7e5ce51ad3955b9d53f208
 # Use Redis adapter to run Action Cable in production
 # gem 'redis', '~> 4.0'
 # Use ActiveModel has_secure_password
@@ -28,6 +32,8 @@ gem 'bootsnap', '>= 1.1.0', require: false
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 gem 'rack-cors'
 
+gem 'omniauth'
+gem 'devise_token_auth'
 gem 'devise'
 gem 'devise_token_auth'
 

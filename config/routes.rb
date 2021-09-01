@@ -1,9 +1,11 @@
 Rails.application.routes.draw do
 
   namespace :api do
-    mount_devise_token_auth_for 'User', at: 'auth', controllers: {
-        registrations: 'api/auth/registrations'
-    }
+    namespace :v1 do
+      mount_devise_token_auth_for 'User', at: 'user', controllers: {
+          registrations: 'api/v1/user/registrations'
+      }
+    end
   end
 
   # get 'static_pages/home'

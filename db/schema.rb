@@ -17,7 +17,7 @@ ActiveRecord::Schema.define(version: 2021_09_03_024220) do
 
   create_table "connections", force: :cascade do |t|
     t.integer "user_id"
-    t.integer "shop_id"
+    t.integer "store_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

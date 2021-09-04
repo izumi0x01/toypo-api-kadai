@@ -29,12 +29,11 @@ class Api::V1::ConnectionsController < ApplicationController
     end
 
     def show
-        #ユーザのemailを渡すと、登録した全ての店舗の情報（メアド、名前、住所）を返す。
         if params[:store_email].empty? && find_User_record_in_User_table
-            
+            #ユーザのemailを渡すと、登録した店舗の情報（メアド、名前、住所）を返す。
             show_User_records_in_Connection_table
         elsif params[:user_email].empty?  && find_Store_record_in_Store_table
-            
+            #店舗のemailを渡すと、登録したユーザの情報（メアド、名前）を返す。
             show_Store_records_in_Connection_table
         end
     end

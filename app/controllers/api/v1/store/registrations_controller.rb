@@ -1,4 +1,6 @@
-class Api::Store::StoreregistrationsController < DeviseTokenAuth::RegistrationsController
+class Api::V1::Store::RegistrationsController < DeviseTokenAuth::RegistrationsController
+
+
 
     private
 
@@ -9,5 +11,7 @@ class Api::Store::StoreregistrationsController < DeviseTokenAuth::RegistrationsC
     def account_update_params
         params.permit(:email,:name,:address,:password)
     end
+
+
 
 end

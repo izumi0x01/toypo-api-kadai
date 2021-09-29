@@ -12,12 +12,12 @@ class Api::V1::ConnectionsController < ApplicationController
         end
         
         
-        unless Store.find_by_id(connections_params.store_id)
+        unless Store.find_by_id(exist_connection.store_id)
             render json: {error: 'store record cant find'}, status: :not_found
             return
         end 
         
-        unless User.find_by_id(connections_params.user_id)
+        unless User.find_by_id(exist_connection.user_id)
             render json: {error: 'user record cant find'}, status: :not_found
             return
         end
@@ -53,7 +53,7 @@ class Api::V1::ConnectionsController < ApplicationController
             exist_connection.destroy
             render json: exist_connection, status: :ok and return 
         else
-            render json: { error: 'record was not found'}, status: :ok and return 
+            render json: { error: 'record was not found'}, status: :not_found and return 
         end
     end
 

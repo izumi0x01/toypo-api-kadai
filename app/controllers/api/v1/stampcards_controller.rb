@@ -1,7 +1,8 @@
 class Api::V1::StampcardsController < ApplicationController
 
     def create
-        exist_stampcard = Stampcard.find_by(stampcards_params)
+
+        exist_stampcard = Stampcard.find_by(user_id: stampcards_params.user_id)
         if exist_stampcard.present?
             render json: {error: 'stampcard record was already registored'}, status: 404 and return
         end
@@ -20,12 +21,12 @@ class Api::V1::StampcardsController < ApplicationController
 
     def stamp
 
-        exist_stampcard = Stampcard.find_by(stampcards_params)
+        exist_stampcard = Stampcard.find_by(user_id: stampcards_params.user_id)
         if exist_stampcard.present?
             render json: {error: 'stampcard record was already registored'}, status: 404 and return
         end
 
-        currente_stampcount = Stampcard.find_by(user_id: stampcards_params.user_id).stamp_count
+        currente_stampcount = exist_stampcard.stamp_count
         currente_stampcount += 1;
         exist_stampcard.stamp_count = currente_stampcount;
 

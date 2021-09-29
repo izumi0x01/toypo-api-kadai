@@ -66,10 +66,10 @@ class Api::V1::ConnectionsController < ApplicationController
         #ユーザのemailと店舗のemailをもらうと、当該のレコードを削除
         exist_connection = Connection.find_by(connections_params)
 
-        if exist_connection.nil?
-            render json: {error: "record was not exist"}, status: :not_found and return
-        else
+        if exist_connection.present?
             render json: exist_connection, status: :ok and return
+        else
+            render json: {error: "record was not exist"}, status: :not_found and return
         end
 
     end

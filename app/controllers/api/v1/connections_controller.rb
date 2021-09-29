@@ -8,17 +8,17 @@ class Api::V1::ConnectionsController < ApplicationController
         #レコードが存在すれば，スルー
         exist_connection = Connection.find_by(connections_params)
         if exist_connection.present?
-            render json: {error: 'connection record was already registored'}, status: 422 and return
+            render json: {error: 'connection record was already registored'}, status: :bad_request and return
         end
         
         
         unless Store.find_by_id(connections_params.store_id)
-            render json: {error: 'store record cant find'}, status: 422 
+            render json: {error: 'store record cant find'}, status: :not_found
             return
         end 
         
         unless User.find_by_id(connections_params.user_id)
-            render json: {error: 'user record cant find'}, status: 422 
+            render json: {error: 'user record cant find'}, status: :not_found
             return
         end
 
@@ -26,9 +26,9 @@ class Api::V1::ConnectionsController < ApplicationController
         new_connection = Connection.new(connections_params)
 
         if new_connection.save
-            render json: new_connection, status: 200 and return
+            render json: new_connection, status: :ok and return
         else 
-            render json: {error: 'connection record cant registore'}, status: 422  and return
+            render json: {error: 'connection record cant registore'}, status: :bad_request  and return
         end
  
     end
@@ -39,21 +39,21 @@ class Api::V1::ConnectionsController < ApplicationController
         exist_connection = Connection.find_by(connections_params)
 
         unless Store.find_by_id(exist_connection.store_id)
-            render json: {error: 'store record cant find'}, status: 422 
+            render json: {error: 'store record cant find'}, status: :not_found
             return
         end 
 
         unless User.find_by_id(exist_connection.user_id)
-            render json: {error: 'user record cant find'}, status: 422 
+            render json: {error: 'user record cant find'}, status: :not_found
             return
         end
 
         if exist_connection.present?
             #レコードが登録されていたならば既存のレコードを削除
             exist_connection.destroy
-            render json: exist_connection, status: 200 and return 
+            render json: exist_connection, status: :ok and return 
         else
-            render json: { error: 'record was not found'}, status: 422 and return 
+            render json: { error: 'record was not found'}, status: :ok and return 
         end
     end
 

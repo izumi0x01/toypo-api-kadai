@@ -7,7 +7,7 @@ class User < ActiveRecord::Base
 
   #stampcardの関連付け
   has_many :stampcards,  dependent: :destroy
-  has_many :stampcard_contents, throw: :stampcards
+  has_many :stampcard_contents, through: :stampcards
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable

@@ -7,7 +7,7 @@ class Api::V1::ConnectionsController < ApplicationController
         exist_connection = Connection.find_by(connections_params)
         if exist_connection.present?
             render json: {error: 'connection record was already registored'}, status: 422 and return
-        en
+        end
         
         #レコードを作成
         new_connection = Connection.new(connections_params)

@@ -5,6 +5,6 @@ class Stampcard < ApplicationRecord
     
     #stampacrd_contentとの関連付け
     belongs_to :stampcard_content
-    has_many :shops, throw: :stampcard_contents
+    has_many :shops, through: :stampcard_contents
     
 end

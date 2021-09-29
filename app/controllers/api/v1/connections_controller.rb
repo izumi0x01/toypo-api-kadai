@@ -1,5 +1,7 @@
 class Api::V1::ConnectionsController < ApplicationController
     
+    before_action :authenticate_user!
+
     def create 
         #ユーザのmeailと店舗のemailをもらうと、レコードを追加
 
@@ -9,18 +11,19 @@ class Api::V1::ConnectionsController < ApplicationController
             render json: {error: 'connection record was already registored'}, status: 422 and return
         end
         
-        #レコードを作成
-        new_connection = Connection.new(connections_params)
-
-        unless Store.find_by_id(new_connection.store_id)
+        
+        unless Store.find_by_id(connections_params.store_id)
             render json: {error: 'store record cant find'}, status: 422 
             return
         end 
-
-        unless User.find_by_id(new_connection.user_id)
+        
+        unless User.find_by_id(connections_params.user_id)
             render json: {error: 'user record cant find'}, status: 422 
             return
         end
+
+        #レコードを作成
+        new_connection = Connection.new(connections_params)
 
         if new_connection.save
             render json: new_connection, status: 200 and return
@@ -54,6 +57,14 @@ class Api::V1::ConnectionsController < ApplicationController
         end
     end
 
+    def index
+
+    end
+
+    def show
+    end
+    
+    private
 
     def connections_params
         params.permit(:user_id, :store_id)

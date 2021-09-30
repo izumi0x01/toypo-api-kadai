@@ -1,10 +1,10 @@
 class Api::V1::ConnectionsController < ApplicationController
     
-    before_action :authenticate_user!
-
     def create 
         #ユーザのmeailと店舗のemailをもらうと、レコードを追加
 
+
+        
         #レコードが存在すれば，スルー
         exist_connection = Connection.find_by(connections_params)
         if exist_connection.present?
@@ -12,18 +12,45 @@ class Api::V1::ConnectionsController < ApplicationController
         end
         
         
-        unless Store.find_by_id(exist_connection.store_id)
+        #ユーザとストアが存在するかを確認する
+        
+        unless User.find_by_id(params[:user_id])
+            render json: {error: 'user record cant find'}, status: :not_found
+            return
+        end
+        
+        unless Store.find_by_id(params[:store_id])
             render json: {error: 'store record cant find'}, status: :not_found
             return
         end 
         
-        unless User.find_by_id(exist_connection.user_id)
-            render json: {error: 'user record cant find'}, status: :not_found
+        # #token認証
+        if api_v1_user_signed_in?
+    
+            client = request.headers['client']
+            token = request.headers['access-token']
+
+            unless User.find_by_id(params[:user_id]).is_token_match?(token, client)
+                render json: {error: 'user token not matched'}, status: :method_not_allowed and return
+            end
+
+        elsif api_v1_store_signed_in?
+
+            client = request.headers['client']
+            token = request.headers['access-token']
+
+            unless Store.find_by_id(params[:store_id]).is_token_match?(token, client)
+                render json: {error: 'store token not matched'}, status: :method_not_allowed and return
+            end
+            
+        else
+            render json: {error: 'didnt log in'}, status: :method_not_allowed and return
             return
         end
 
         #レコードを作成
         new_connection = Connection.new(connections_params)
+
 
         if new_connection.save
             render json: new_connection, status: :ok and return
@@ -36,6 +63,9 @@ class Api::V1::ConnectionsController < ApplicationController
     def destroy
         
         #ユーザのemailと店舗のemailをもらうと、当該のレコードを削除
+
+
+
         exist_connection = Connection.find_by(connections_params)
 
         unless Store.find_by_id(exist_connection.store_id)
@@ -45,6 +75,30 @@ class Api::V1::ConnectionsController < ApplicationController
 
         unless User.find_by_id(exist_connection.user_id)
             render json: {error: 'user record cant find'}, status: :not_found
+            return
+        end
+
+        # #token認証
+        if api_v1_user_signed_in?
+
+            client = request.headers['client']
+            token = request.headers['access-token']
+
+            unless User.find_by_id(params[:user_id]).is_token_match?(token, client)
+                render json: {error: 'user token not matched'}, status: :method_not_allowed and return
+            end
+
+        elsif api_v1_store_signed_in?
+
+            client = request.headers['client']
+            token = request.headers['access-token']
+
+            unless Store.find_by_id(params[:store_id]).is_token_match?(token, client)
+                render json: {error: 'store token not matched'}, status: :method_not_allowed and return
+            end
+            
+        else
+            render json: {error: 'didnt log in'}, status: :method_not_allowed and return
             return
         end
 
@@ -59,11 +113,68 @@ class Api::V1::ConnectionsController < ApplicationController
 
     def index
 
+        # storeとuserのそれぞれの場合においてtoken認証が通っていれば，ユーザとストアのindexを返す
+
+        # #token認証
+        if api_v1_user_signed_in?
+    
+            client = request.headers['client']
+            token = request.headers['access-token']
+
+            connected_user = User.find_by_id(params[:user_id])
+            if connected_user.is_token_match?(token, client)
+                render json: Connection.where(user_id: params[:user_id]), status: :ok and return 
+            else
+                render json: {error: 'user token not matched'}, status: :method_not_allowed and return
+            end
+            
+
+        elsif api_v1_store_signed_in?
+
+            client = request.headers['client']
+            token = request.headers['access-token']
+
+            connected_store = Store.find_by_id(params[:store_id])
+            if connected_store.is_token_match?(token, client)
+                render json: Connection.where(store_id: params[:store_id]) , status: :ok and return 
+            else
+                render json: {error: 'store token not matched'}, status: :method_not_allowed and return
+            end
+            
+        else
+            render json: {error: 'didnt log in'}, status: :method_not_allowed and return
+            return
+        end
+
     end
 
     def show
 
-        #ユーザのemailと店舗のemailをもらうと、当該のレコードを削除
+        # #token認証
+        if api_v1_user_signed_in?
+    
+            client = request.headers['client']
+            token = request.headers['access-token']
+
+            unless User.find_by_id(params[:user_id]).is_token_match?(token, client)
+                render json: {error: 'user token not matched'}, status: :method_not_allowed and return
+            end
+
+        elsif api_v1_store_signed_in?
+
+            client = request.headers['client']
+            token = request.headers['access-token']
+
+            unless Store.find_by_id(params[:store_id]).is_token_match?(token, client)
+                render json: {error: 'store token not matched'}, status: :method_not_allowed and return
+            end
+            
+        else
+            render json: {error: 'didnt log in'}, status: :method_not_allowed and return
+            return
+        end
+
+        #ユーザのemailと店舗のemailをもらうと、当該のレコードを照会
         exist_connection = Connection.find_by(connections_params)
 
         if exist_connection.present?

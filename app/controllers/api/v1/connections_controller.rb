@@ -4,8 +4,8 @@ class Api::V1::ConnectionsController < ApplicationController
         #ユーザのmeailと店舗のemailをもらうと、レコードを追加
 
 
-        
         #レコードが存在すれば，スルー
+        
         exist_connection = Connection.find_by(connections_params)
         if exist_connection.present?
             render json: {error: 'connection record was already registored'}, status: :bad_request and return
@@ -30,7 +30,7 @@ class Api::V1::ConnectionsController < ApplicationController
             client = request.headers['client']
             token = request.headers['access-token']
 
-            unless User.find_by_id(params[:user_id]).is_token_match?(token, client)
+            unless User.find_by_id(params[:user_id]).valid_token?(token, client)
                 render json: {error: 'user token not matched'}, status: :method_not_allowed and return
             end
 
@@ -39,7 +39,7 @@ class Api::V1::ConnectionsController < ApplicationController
             client = request.headers['client']
             token = request.headers['access-token']
 
-            unless Store.find_by_id(params[:store_id]).is_token_match?(token, client)
+            unless Store.find_by_id(params[:store_id]).valid_token?(token, client)
                 render json: {error: 'store token not matched'}, status: :method_not_allowed and return
             end
             
@@ -84,7 +84,7 @@ class Api::V1::ConnectionsController < ApplicationController
             client = request.headers['client']
             token = request.headers['access-token']
 
-            unless User.find_by_id(params[:user_id]).is_token_match?(token, client)
+            unless User.find_by_id(params[:user_id]).valid_token?(token, client)
                 render json: {error: 'user token not matched'}, status: :method_not_allowed and return
             end
 
@@ -93,13 +93,12 @@ class Api::V1::ConnectionsController < ApplicationController
             client = request.headers['client']
             token = request.headers['access-token']
 
-            unless Store.find_by_id(params[:store_id]).is_token_match?(token, client)
+            unless Store.find_by_id(params[:store_id]).valid_token?(token, client)
                 render json: {error: 'store token not matched'}, status: :method_not_allowed and return
             end
             
         else
             render json: {error: 'didnt log in'}, status: :method_not_allowed and return
-            return
         end
 
         if exist_connection.present?
@@ -122,7 +121,7 @@ class Api::V1::ConnectionsController < ApplicationController
             token = request.headers['access-token']
 
             connected_user = User.find_by_id(params[:user_id])
-            if connected_user.is_token_match?(token, client)
+            if connected_user.valid_token?(token, client)
                 render json: Connection.where(user_id: params[:user_id]), status: :ok and return 
             else
                 render json: {error: 'user token not matched'}, status: :method_not_allowed and return
@@ -135,7 +134,7 @@ class Api::V1::ConnectionsController < ApplicationController
             token = request.headers['access-token']
 
             connected_store = Store.find_by_id(params[:store_id])
-            if connected_store.is_token_match?(token, client)
+            if connected_store.valid_token?(token, client)
                 render json: Connection.where(store_id: params[:store_id]) , status: :ok and return 
             else
                 render json: {error: 'store token not matched'}, status: :method_not_allowed and return
@@ -156,7 +155,7 @@ class Api::V1::ConnectionsController < ApplicationController
             client = request.headers['client']
             token = request.headers['access-token']
 
-            unless User.find_by_id(params[:user_id]).is_token_match?(token, client)
+            unless User.find_by_id(params[:user_id]).valid_token?(token, client)
                 render json: {error: 'user token not matched'}, status: :method_not_allowed and return
             end
 
@@ -165,7 +164,7 @@ class Api::V1::ConnectionsController < ApplicationController
             client = request.headers['client']
             token = request.headers['access-token']
 
-            unless Store.find_by_id(params[:store_id]).is_token_match?(token, client)
+            unless Store.find_by_id(params[:store_id]).valid_token?(token, client)
                 render json: {error: 'store token not matched'}, status: :method_not_allowed and return
             end
             
@@ -189,6 +188,10 @@ class Api::V1::ConnectionsController < ApplicationController
 
     def connections_params
         params.permit(:user_id, :store_id)
+    end
+
+    def token_auth
+
     end
 
 end

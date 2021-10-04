@@ -8,10 +8,10 @@ class User < ActiveRecord::Base
          :recoverable, :rememberable, :validatable
   include DeviseTokenAuth::Concerns::User
 
-  def is_token_match?(token, client)
+  # def is_token_match?(token, client)
     
-    self.valid_token?(token, client)
+  #   self.valid_token?(token, client)
     
-  end
+  # end
 
 end

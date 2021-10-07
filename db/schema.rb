@@ -16,10 +16,11 @@ ActiveRecord::Schema.define(version: 2021_09_03_024220) do
   enable_extension "plpgsql"
 
   create_table "connections", force: :cascade do |t|
-    t.integer "user_id"
-    t.integer "store_id"
+    t.integer "user_id", null: false
+    t.integer "store_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["user_id", "store_id"], name: "index_connections_on_user_id_and_store_id", unique: true
   end
 
   create_table "stores", force: :cascade do |t|

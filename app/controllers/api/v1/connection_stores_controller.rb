@@ -6,13 +6,13 @@ class Api::V1::ConnectionStoresController < ApplicationController
     def create 
 
         # #レコードが存在するか        
-        # exist_connection = current_api_v1_store.connections.find_by(connection_stores_params)
-        # if exist_connection.present?
-        #     render json: {error: 'connection record was already registored'}, status: :bad_request and return
-        # end
+        exist_connection = current_api_v1_store.connections.find_by(connection_stores_params)
+        if exist_connection.present?
+            render json: {error: 'connection record was already registored'}, status: :bad_request and return
+        end
         
         #ストアが存在するか
-        unless User.find_by(connection_stores_params)
+        unless User.find(params[:user_id])
             render json: {error: 'user record cant find'}, status: :not_found
             return
         end 

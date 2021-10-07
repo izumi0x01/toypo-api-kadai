@@ -5,14 +5,14 @@ class Api::V1::ConnectionUsersController < ApplicationController
     #ユーザのidをもらうとレコードを作成
     def create 
 
-        # #レコードが存在するか        
-        # exist_connection = current_api_v1_user.connections.find_by(connection_users_params)
-        # if exist_connection.present?
-        #     render json: {error: 'connection record was already registored'}, status: :bad_request and return
-        # end
+        #レコードが存在するか        
+        exist_connection = current_api_v1_user.connections.find_by(connection_users_params)
+        if exist_connection.present?
+            render json: {error: 'connection record was already registored'}, status: :bad_request and return
+        end
         
         #ユーザが存在するか
-        unless Store.find_by(connection_users_params)
+        unless Store.find(params[:store_id])
             render json: {error: 'store record cant find'}, status: :not_found
             return
         end 
@@ -73,7 +73,7 @@ class Api::V1::ConnectionUsersController < ApplicationController
     private
 
     def connection_users_params
-        params.permit(:user_id)
+        params.permit(:store_id)
     end
 
 end

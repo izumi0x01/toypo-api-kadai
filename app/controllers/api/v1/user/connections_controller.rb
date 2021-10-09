@@ -1,4 +1,4 @@
-class Api::V1::ConnectionUsersController < ApplicationController
+class Api::V1::User::ConnectionsController < ApplicationController
     
     before_action :authenticate_api_v1_user!
 

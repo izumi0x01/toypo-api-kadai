@@ -1,4 +1,4 @@
-class Api::V1::ConnectionStoresController < ApplicationController
+class Api::V1::Staff::ConnectionsController < ApplicationController
     
     before_action :authenticate_api_v1_store!
 

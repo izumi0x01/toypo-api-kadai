@@ -14,8 +14,14 @@ Rails.application.routes.draw do
         registrations: 'api/v1/user/registrations'
       }
 
-      resources :connection_users, only: [:create, :destroy, :show, :index]
-      resources :connection_stores, only: [:create, :destroy, :show, :index]
+      namespace :user do
+        resources :connections, only: [:create, :destroy, :show, :index]
+      end
+
+      namespace :staff do
+        resources :connections, only: [:create, :destroy, :show, :index]
+      end
+
     end
   end
   

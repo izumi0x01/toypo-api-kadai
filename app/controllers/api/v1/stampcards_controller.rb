@@ -1,66 +1,105 @@
 class Api::V1::StampcardsController < ApplicationController
 
-    # def create
+    before_action :authenticate_api_v1_user!
 
-    #     exist_stampcard = Stampcard.find_by(user_id: stampcards_params.user_id)
-    #     if exist_stampcard.present?
-    #         render json: {error: 'stampcard record was already registored'}, status: 404 and return
-    #     end
-
-    #     new_stampcard = Stampcard.new(stampcards_params.merge(stamp_count: 0))
-    #     if new_stampcard.save
-    #         render json: new_stampcard, status: 200 and return
-    #     else    
-    #         render json: {error: 'cant regist stampcard'}, status: 404 and return
-    #     end
-    # end 
-
-    # def update
-    #     exist_stampcard = Stampcard.find_by(user_id: stampcards_params.user_id)
-    # end 
-
-    # def stamp
-
-    #     exist_stampcard = Stampcard.find_by(user_id: stampcards_params.user_id)
-    #     if exist_stampcard.present?
-    #         render json: {error: 'stampcard record was already registored'}, status: 404 and return
-    #     end
-
-    #     currente_stampcount = exist_stampcard.stamp_count
-    #     currente_stampcount += 1;
-    #     exist_stampcard.stamp_count = currente_stampcount;
-
-    #     if exist_stampcard.save
-    #         render json: exist_stampcard, status: 200 and return
-    #     else
-    #         render json: {error: 'cant stamp to stampcard'}, status: 404 and return
-    #     end
-
-    # end 
+    #strongparameterで値の受け渡しをする時に，createとupdateで値が一致しないが，その場合の対処
+    #user_id(外部キー), stampcard_contents_id(外部キー), stamp_count
 
     def create
 
+        #stampcard_contentが存在するか
+        unless StampcardContent.find_by_id(params[:stampcard_content_id])
+            render json: {error: 'stampcard_content cant find'}, status: :not_found
+            return
+        end 
+
+        exist_stampcards = current_api_v1_user.stampcards
+        
+        # 存在するスタンプカードのスタンプカードコンテンツidが重複すれば，はねる
+        if exist_stampcards.find_by(stampcard_content_id: params[:stampcard_content_id])
+            render json: {error: 'this kind of stampcard was already registored'}, status: :bad_request and return
+        end
+
+        new_stampcard = current_api_v1_user.stampcards.new(stampcard_content_id: params[:stampcard_content_id], stamp_count: 0)
+
+        #レコードの登録
+        if new_stampcard.save
+            render json: new_stampcard, status: :ok and return
+        else 
+            render json: {error: 'stampcard cant registore'}, status: :bad_request  and return
+        end
+
     end
 
+
     def update
+
+        exist_stampcard = current_api_v1_user.stampcards.find_by(stampcard_content_id: params[:stampcard_content_id])
+
+        unless exist_stampcard.present?
+            render json: { error: 'stampcard was not found'}, status: :not_found and return 
+        end
+
+        #スタンプカードが存在した場合に，スタンプを一つ追加する．
+        exist_stampcard.stamp_count += 1
+
+        #スタンプが上限数を超えると保存ができない
+        if exist_stampcard.stamp_count > exist_stampcard.stampcard_content.max_stamp_count
+            render json: {error: 'stamp maximum count has been exceeded'}, status: :bad_request  and return
+        end
+        
+        if exist_stampcard.save
+            render json: exist_stampcard, status: :ok and return             
+        else
+            render json: {error: 'stampcard cant update'}, status: :bad_request  and return
+        end
+        
 
     end
 
     def destroy
 
+        exist_stampcard = current_api_v1_user.stampcards.find_by(stampcard_content_id: params[:stampcard_content_id])
+
+        if exist_stampcard.present?
+            #レコードが登録されていたならば既存のレコードを削除
+            exist_stampcard.destroy
+            render json: exist_stampcard, status: :ok and return 
+        else
+            render json: { error: 'stampcard was not found'}, status: :not_found and return 
+        end
+
     end
 
-    def show
-
-    end
-
+    # ok
     def index
 
+        exist_stampcards = current_api_v1_user.stampcards.find_by(stampcard_content_id: params[:stampcard_content_id])
+
+        if exist_stampcards.present?
+            render json: exist_stampcards, status: :ok and return
+        else
+            render json: {error: "record was not exist"}, status: :not_found and return
+        end
+
+    end
+
+    
+    def show
+
+        exist_stampcard = current_api_v1_user.stampcards.find_by(stampcard_content_id: params[:stampcard_content_id])
+
+        if exist_stampcard.present?
+            render json: exist_stampcard, status: :ok and return
+        else
+            render json: {error: "stampcard record was not exist"}, status: :not_found and return
+        end
+        
     end
 
     private
 
-    def stampcards_params
-        params.permit()
-    end
+    # def stampcards_params
+    #     params.permit()
+    # end
 end

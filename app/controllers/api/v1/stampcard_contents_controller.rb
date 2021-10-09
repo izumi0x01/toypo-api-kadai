@@ -1,4 +1,6 @@
-class Api::V1::StampcardsController < ApplicationController
+class Api::V1::StampcardContentsController < ApplicationController
+
+    before_action :authenticate_api_v1_store!
 
     def create
 

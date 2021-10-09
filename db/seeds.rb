@@ -24,3 +24,8 @@
       password_confirmation: "111111",
     )
   end
+
+  StampcardContent.create!(
+    store_id: 1,
+    max_stamp_count: 10,
+  )

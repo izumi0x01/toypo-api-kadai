@@ -6,7 +6,7 @@ class Store < ActiveRecord::Base
   has_many :connections, dependent: :destroy
 
   #stampcard_contentの関連付け
-  has_many :stampcard_contents, dependent: :destroy
+  has_one :stampcard_contents, dependent: :destroy
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable

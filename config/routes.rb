@@ -16,6 +16,9 @@ Rails.application.routes.draw do
 
       resources :connection_users, only: [:create, :destroy, :show, :index]
       resources :connection_stores, only: [:create, :destroy, :show, :index]
+
+      resources :stampcards, only: [:create, :destroy, :show, :index]
+      resources :stampcard_contents, only: [:crate, :destroy, :show, :index]
     end
   end
   

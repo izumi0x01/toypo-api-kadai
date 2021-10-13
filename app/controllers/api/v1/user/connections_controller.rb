@@ -32,7 +32,7 @@ class Api::V1::User::ConnectionsController < ApplicationController
     #ユーザのidをもらうと、当該のレコードを削除
     def destroy
         
-        exist_connection = current_api_v1_user.connections.find_by(connection_users_params)
+        exist_connection = current_api_v1_user.connections.find_by_id(params[:id])
 
         if exist_connection.present?
             #レコードが登録されていたならば既存のレコードを削除
@@ -60,7 +60,7 @@ class Api::V1::User::ConnectionsController < ApplicationController
     #店舗のidをもらうと，ユーザとつながっている店舗のレコードを返す
     def show
 
-        exist_connection = current_api_v1_user.connections.find_by(connection_users_params)
+        exist_connection = current_api_v1_user.connections.find_by_id(params[:id])
 
         if exist_connection.present?
             render json: exist_connection, status: :ok and return

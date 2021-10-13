@@ -1,4 +1,4 @@
-class Api::V1::StampcardsController < ApplicationController
+class Api::V1::User::StampcardsController < ApplicationController
 
     before_action :authenticate_api_v1_user!
 

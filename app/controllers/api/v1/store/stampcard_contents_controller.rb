@@ -1,4 +1,4 @@
-class Api::V1::StampcardContentsController < ApplicationController
+class Api::V1::Store::StampcardContentsController < ApplicationController
 
     before_action :authenticate_api_v1_store!
 
@@ -53,10 +53,10 @@ class Api::V1::StampcardContentsController < ApplicationController
     end
 
     def show
-        exist_stampcard = current_api_v1_store.stampcard_content
+        exist_stampcard_content = current_api_v1_store.stampcard_content
 
-        if exist_stampcard.present?
-            render json: exist_stampcard, status: :ok and return
+        if exist_stampcard_content.present?
+            render json: exist_stampcard_content, status: :ok and return
         else
             render json: {error: "stampcard_content was not exist"}, status: :not_found and return
         end

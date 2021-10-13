@@ -1,4 +1,4 @@
-class Api::V1::Staff::ConnectionsController < ApplicationController
+class Api::V1::Store::ConnectionsController < ApplicationController
     
     before_action :authenticate_api_v1_store!
 
@@ -72,8 +72,8 @@ class Api::V1::Staff::ConnectionsController < ApplicationController
     
     private
 
-    # def connection_stores_params
-    #     params.permit(:user_id)
-    # end
+    def connection_stores_params
+        params.permit(:user_id)
+    end
 
 end

@@ -52,7 +52,7 @@ class Api::V1::StampcardsController < ApplicationController
             render json: {error: 'stampcard cant update'}, status: :bad_request  and return
         end
 
-    end
+    end  
 
     def destroy
 

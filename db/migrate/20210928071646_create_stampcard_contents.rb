@@ -5,8 +5,8 @@ class CreateStampcardContents < ActiveRecord::Migration[5.2]
 
       t.integer :max_stamp_count
 
-      # 有効期限をつけるにはどうすればいい
-      # t.datetime :valid_period
+      # 実際
+      # t.integer :valid_day
 
       t.timestamps
     end

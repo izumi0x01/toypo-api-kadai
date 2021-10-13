@@ -16,14 +16,14 @@ Rails.application.routes.draw do
 
       namespace :user do
         resources :connections, only: [:create, :destroy, :show, :index]
+        resources :stampcards
       end
 
-      namespace :staff do
+      namespace :store do
         resources :connections, only: [:create, :destroy, :show, :index]
+        resource :stampcard_contents
       end
 
-      resources :stampcards, only: [:create, :destroy, :update, :show, :index]
-      resources :stampcard_contents, only: [:crate, :destroy, :update, :show, :index]
 
     end
   end

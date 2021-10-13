@@ -32,12 +32,12 @@ class Api::V1::Staff::ConnectionsController < ApplicationController
     #店舗のidをもらうと、当該のレコードを削除
     def destroy
         
-        exist_connection = current_api_v1_store.connections.find_by(connection_stores_params)
+        exist_connection = current_api_v1_store.connections.find_by(params[:id])
 
         if exist_connection.present?
             #レコードが登録されていたならば既存のレコードを削除
             exist_connection.destroy
-            render json: exist_connection, status: :ok and return 
+            render json: { message: 'success to delete record'}, status: :ok and return 
         else
             render json: { error: 'record was not found'}, status: :not_found and return 
         end
@@ -60,7 +60,7 @@ class Api::V1::Staff::ConnectionsController < ApplicationController
     #店舗のidをもらうと，ユーザとつながっている店舗のレコードを返す
     def show
 
-        exist_connection = current_api_v1_store.connections.find_by(connection_stores_params)
+        exist_connection = current_api_v1_store.connections.find_by(params[:id])
 
         if exist_connection.present?
             render json: exist_connection, status: :ok and return
@@ -72,8 +72,8 @@ class Api::V1::Staff::ConnectionsController < ApplicationController
     
     private
 
-    def connection_stores_params
-        params.permit(:user_id)
-    end
+    # def connection_stores_params
+    #     params.permit(:user_id)
+    # end
 
 end

@@ -2,13 +2,10 @@ class Api::V1::StampcardsController < ApplicationController
 
     before_action :authenticate_api_v1_user!
 
-    #strongparameterで値の受け渡しをする時に，createとupdateで値が一致しないが，その場合の対処
-    #user_id(外部キー), stampcard_contents_id(外部キー), stamp_count
-
     def create
 
         #stampcard_contentが存在するか
-        unless StampcardContent.find_by_id(params[:stampcard_content_id])
+        unless StampcardContent.find_by_id(stampcard_content_id: params[:stampcard_content_id])
             render json: {error: 'stampcard_content cant find'}, status: :not_found
             return
         end 
@@ -34,12 +31,13 @@ class Api::V1::StampcardsController < ApplicationController
 
     def update
 
-        exist_stampcard = current_api_v1_user.stampcards.find_by(stampcard_content_id: params[:stampcard_content_id])
+        exist_stampcard = current_api_v1_user.stampcards.find_by_id(params[:id])
 
         unless exist_stampcard.present?
             render json: { error: 'stampcard was not found'}, status: :not_found and return 
         end
 
+        
         #スタンプカードが存在した場合に，スタンプを一つ追加する．
         exist_stampcard.stamp_count += 1
 
@@ -53,18 +51,17 @@ class Api::V1::StampcardsController < ApplicationController
         else
             render json: {error: 'stampcard cant update'}, status: :bad_request  and return
         end
-        
 
     end
 
     def destroy
 
-        exist_stampcard = current_api_v1_user.stampcards.find_by(stampcard_content_id: params[:stampcard_content_id])
+        exist_stampcard = current_api_v1_user.stampcards.find_by_id(params[:id])
 
         if exist_stampcard.present?
             #レコードが登録されていたならば既存のレコードを削除
             exist_stampcard.destroy
-            render json: exist_stampcard, status: :ok and return 
+            render json: { message: 'success to delete record'} , status: :ok and return 
         else
             render json: { error: 'stampcard was not found'}, status: :not_found and return 
         end
@@ -87,7 +84,7 @@ class Api::V1::StampcardsController < ApplicationController
     
     def show
 
-        exist_stampcard = current_api_v1_user.stampcards.find_by(stampcard_content_id: params[:stampcard_content_id])
+        exist_stampcard = current_api_v1_user.stampcards.find_by_id(params[:id])
 
         if exist_stampcard.present?
             render json: exist_stampcard, status: :ok and return
@@ -99,7 +96,16 @@ class Api::V1::StampcardsController < ApplicationController
 
     private
 
-    # def stampcards_params
-    #     params.permit()
-    # end
+    def stampcards_create_params
+        params.permit(:stampcard_content_id)
+    end
+    
+    def stampcards_update_params
+        params.permit(:stampcard_content_id)
+    end
+    
 end
+
+
+    
+

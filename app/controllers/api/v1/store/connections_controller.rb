@@ -1,11 +1,12 @@
 class Api::V1::Store::ConnectionsController < ApplicationController
     
-    before_action :authenticate_api_v1_store!
+    before_action :authenticate_api_v1_store!, except: :index
 
     #店舗のidをもらうとレコードを作成
     def create 
 
         # #レコードが存在するか        
+        
         exist_connection = current_api_v1_store.connections.find_by(connection_stores_params)
         if exist_connection.present?
             render json: {error: 'connection record was already registored'}, status: :bad_request and return
@@ -26,13 +27,12 @@ class Api::V1::Store::ConnectionsController < ApplicationController
         else 
             render json: {error: 'connection record cant registore'}, status: :bad_request  and return
         end
- 
     end
 
     #店舗のidをもらうと、当該のレコードを削除
     def destroy
         
-        exist_connection = current_api_v1_store.connections.find_by(params[:id])
+        exist_connection = current_api_v1_store.connections.find_by_id(params[:id])
 
         if exist_connection.present?
             #レコードが登録されていたならば既存のレコードを削除
@@ -60,7 +60,7 @@ class Api::V1::Store::ConnectionsController < ApplicationController
     #店舗のidをもらうと，ユーザとつながっている店舗のレコードを返す
     def show
 
-        exist_connection = current_api_v1_store.connections.find_by(params[:id])
+        exist_connection = current_api_v1_store.connections.find_by_id(params[:id])
 
         if exist_connection.present?
             render json: exist_connection, status: :ok and return

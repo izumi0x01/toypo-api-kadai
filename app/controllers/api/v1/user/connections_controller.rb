@@ -37,7 +37,7 @@ class Api::V1::User::ConnectionsController < ApplicationController
         if exist_connection.present?
             #レコードが登録されていたならば既存のレコードを削除
             exist_connection.destroy
-            render json: exist_connection, status: :ok and return 
+            render json: { message: 'success to delete record'}, status: :ok and return 
         else
             render json: { error: 'record was not found'}, status: :not_found and return 
         end

@@ -10,10 +10,37 @@ class Api::V1::Store::ConnectionsController < ApplicationController
 
     before_action :authenticate_api_v1_store!
 
-    def create 
-        
+    def index
 
-        #既に存在するコネクションレコードを参照
+        #コネクションレコードの一覧を参照
+        exist_connections = current_api_v1_store.connections
+
+        #コネクションレコードの一覧をレスポンスに渡すことができたかどうかの確認
+        if exist_connections.present?
+            render json: exist_connections, status: :ok and return
+        else
+            render json: {error: "record was not exist"}, status: :not_found and return
+        end
+
+    end
+
+    def show
+
+        #コネクションレコードを参照
+        exist_connection = current_api_v1_store.connections.find_by_id(params[:id])
+
+        #コネクションレコードをレスポンスに渡すことができたかどうかの確認
+        if exist_connection.present?
+            render json: exist_connection, status: :ok and return
+        else
+            render json: {error: "record was not exist"}, status: :not_found and return
+        end
+        
+    end
+
+    def create 
+
+        #コネクションレコードを参照
         exist_connection = current_api_v1_store.connections.find_by(user_id: params[:user_id])
 
         #コネクションレコードが存在するかの確認
@@ -30,7 +57,7 @@ class Api::V1::Store::ConnectionsController < ApplicationController
             return
         end 
         
-        #新たに登録するコネクションレコードの作成
+        #登録するコネクションレコードの作成
         new_connection = current_api_v1_store.connections.new(user_id: params[:user_id])
 
         #コネクションレコードが無事に登録できたかの確認
@@ -44,7 +71,7 @@ class Api::V1::Store::ConnectionsController < ApplicationController
 
     def destroy
         
-        #既に存在するコネクションレコードを参照   
+        #コネクションレコードを参照   
         exist_connection = current_api_v1_store.connections.find_by_id(params[:id])
 
         #コネクションレコードが存在するかの確認
@@ -59,34 +86,6 @@ class Api::V1::Store::ConnectionsController < ApplicationController
             render json: {error: 'connection record cant destroy'}, status: :bad_request  and return
         end
 
-    end
-
-    def index
-
-        #既に存在するコネクションレコードの一覧を参照
-        exist_connections = current_api_v1_store.connections
-
-        #コネクションレコードの一覧をレスポンスに渡すことができたかどうかの確認
-        if exist_connections.present?
-            render json: exist_connections, status: :ok and return
-        else
-            render json: {error: "record was not exist"}, status: :not_found and return
-        end
-
-    end
-
-    def show
-
-        #既に存在するコネクションレコードを参照
-        exist_connection = current_api_v1_store.connections.find_by_id(params[:id])
-
-        #コネクションレコードをレスポンスに渡すことができたかどうかの確認
-        if exist_connection.present?
-            render json: exist_connection, status: :ok and return
-        else
-            render json: {error: "record was not exist"}, status: :not_found and return
-        end
-        
     end
 
 end

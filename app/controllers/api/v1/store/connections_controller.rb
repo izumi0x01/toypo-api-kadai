@@ -11,6 +11,7 @@ class Api::V1::Store::ConnectionsController < ApplicationController
     before_action :authenticate_api_v1_store!
 
     def create 
+        
 
         #既に存在するコネクションレコードを参照
         exist_connection = current_api_v1_store.connections.find_by(user_id: params[:user_id])

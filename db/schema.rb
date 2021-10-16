@@ -25,6 +25,7 @@ ActiveRecord::Schema.define(version: 2021_09_28_071827) do
 
   create_table "stampcard_contents", force: :cascade do |t|
     t.bigint "store_id"
+    t.integer "add_stamp_count"
     t.integer "max_stamp_count"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

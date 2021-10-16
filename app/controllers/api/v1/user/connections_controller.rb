@@ -2,25 +2,29 @@ class Api::V1::User::ConnectionsController < ApplicationController
     
     before_action :authenticate_api_v1_user!
 
-    #ユーザのidをもらうとレコードを作成
     def create 
 
-        #レコードが存在するか        
-        exist_connection = current_api_v1_user.connections.find_by(connection_users_params)
+        #既に存在するコネクションレコードを参照   
+        exist_connection = current_api_v1_user.connections.find_by(store_id: params[:store_id])
+
+        #コネクションレコードが存在するかの確認
         if exist_connection.present?
             render json: {error: 'connection record was already registored'}, status: :bad_request and return
         end
-        
-        #ユーザが存在するか
+
+        #既に存在するストアレコードの参照
+        exist_user = Store.find(params[:store_id])
+
+        #ストアレコードが存在するかの確認
         unless Store.find(params[:store_id])
             render json: {error: 'store record cant find'}, status: :not_found
             return
-        end 
+        end
 
-        #device_token_authを使ってレコードを作成
-        new_connection = current_api_v1_user.connections.new(connection_users_params)
+        #新たに登録するコネクションレコードの作成
+        new_connection = current_api_v1_user.connections.new(store_id: params[:store_id])
 
-        #レコードの登録
+        #コネクションレコードが無事に登録できたかの確認
         if new_connection.save
             render json: new_connection, status: :ok and return
         else 
@@ -29,26 +33,31 @@ class Api::V1::User::ConnectionsController < ApplicationController
  
     end
 
-    #ユーザのidをもらうと、当該のレコードを削除
     def destroy
         
+        #既に存在するコネクションレコードを参照   
         exist_connection = current_api_v1_user.connections.find_by_id(params[:id])
 
-        if exist_connection.present?
-            #レコードが登録されていたならば既存のレコードを削除
-            exist_connection.destroy
-            render json: { message: 'success to delete record'}, status: :ok and return 
-        else
+        #コネクションレコードが存在するかの確認
+        if exist_connection.nil?
             render json: { error: 'record was not found'}, status: :not_found and return 
+        end
+        
+        #コネクションレコードが実際に削除されたかの確認
+        if exist_connection.destroy
+            render json: {message: "success to delete record"}, status: :ok and return
+        else 
+            render json: {error: 'connection record cant destroy'}, status: :bad_request  and return
         end
 
     end
 
-    #店舗のidをもらうと，つながっている全てのレコードを返す
     def index
 
+        #既に存在するコネクションレコードの一覧を参照   
         exist_connections = current_api_v1_user.connections
 
+        #コネクションレコードの一覧をレスポンスに渡すことができたかどうかの確認
         if exist_connections.present?
             render json: exist_connections, status: :ok and return
         else
@@ -57,23 +66,18 @@ class Api::V1::User::ConnectionsController < ApplicationController
 
     end
 
-    #店舗のidをもらうと，ユーザとつながっている店舗のレコードを返す
     def show
 
+        #既に存在するコネクションレコードを参照
         exist_connection = current_api_v1_user.connections.find_by_id(params[:id])
 
+        #コネクションレコードをレスポンスに渡すことができたかどうかの確認
         if exist_connection.present?
             render json: exist_connection, status: :ok and return
         else
             render json: {error: "record was not exist"}, status: :not_found and return
         end
 
-    end
-    
-    private
-
-    def connection_users_params
-        params.permit(:store_id)
     end
 
 end

@@ -9,16 +9,12 @@ class Store < ActiveRecord::Base
   has_one :stampcard_content, dependent: :destroy
 
   #stampcard_contentの関連付け
-  has_many :coupon_content, dependent: :destroy
+  has_many :coupon_contents, dependent: :destroy
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
           :recoverable, :rememberable, :validatable
   include DeviseTokenAuth::Concerns::User
-
-
-
-  
 
 end

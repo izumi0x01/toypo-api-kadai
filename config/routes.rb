@@ -17,6 +17,7 @@ Rails.application.routes.draw do
       namespace :user do
         resources :connections, only: [:create, :destroy, :show, :index]
         resources :stampcards
+        resources :coupons
       end
 
       namespace :store do

@@ -2,87 +2,101 @@ class CouponContentsController < ApplicationController
 
     before_action :authenticate_api_v1_store!
 
+    def index
+
+        #クーポンコンテンツレコードの一覧の参照
+        exist_coupon_contents = current_api_v1_store.coupon_contents
+
+        #クーポンコンテンツレコードが存在すれば，レコードの一覧をレスポンスに渡す
+        if exist_coupon_contents.present?
+            render json: exist_coupon_contents, status: :ok and return
+        else
+            render json: {error: "coupon_content was not exist"}, status: :not_found and return
+        end
+
+    end
+
     def show
         
-        #スタンプカードコンテンツレコードの参照
-        exist_stampcard_content = current_api_v1_store.stampcard_content
+        #クーポンコンテンツレコードの参照
+        exist_coupon_content = current_api_v1_store.coupon_contents.find_by_id(params[:id])
 
-        #スタンプカードコンテンツレコードが存在すれば，レコードをレスポンスに渡す
-        if exist_stampcard_content.present?
-            render json: exist_stampcard_content, status: :ok and return
+        #クーポンコンテンツレコードが存在すれば，レコードをレスポンスに渡す
+        if exist_coupon_content.present?
+            render json: exist_coupon_content, status: :ok and return
         else
-            render json: {error: "stampcard_content was not exist"}, status: :not_found and return
+            render json: {error: "coupon_content was not exist"}, status: :not_found and return
         end
     end 
 
     def create
 
-        #スタンプカードコンテンツレコードの参照
-        exist_stampcard_content = current_api_v1_store.stampcard_content
+        #クーポンコンテンツレコードの参照
+        exist_coupon_content = current_api_v1_store.coupon_contents.find_by(store_id: params[:store_id])
 
-        #スタンプカードコンテンツレコードが登録できているかの確認
-        if exist_stampcard_content.present?
-            render json: {error: 'stampcard_content was already registored'}, status: :bad_request and return
+        #クーポンコンテンツレコードが登録できているかの確認
+        if exist_coupon_content.present?
+            render json: {error: 'coupon_content was already registored'}, status: :bad_request and return
         end
 
-        #スタンプカードコンテンツレコードの作成
-        new_stampcard_content = current_api_v1_store.build_stampcard_content(create_stampcard_contents_params)
+        # クーポンコンテンツレコードの作成
+        new_coupon_content = current_api_v1_store.coupon_contents.new(create_coupon_contents_params)
 
-        #スタンプカードコンテンツレコードが登録できたかの確認
-        if new_stampcard_content.save
-            render json: new_stampcard_content, status: :ok and return
+        #クーポンコンテンツレコードが登録できたかの確認
+        if new_coupon_content.save
+            render json: new_coupon_content, status: :ok and return
         else 
-            render json: {error: 'stampcard_content cant registore'}, status: :bad_request  and return
+            render json: {error: 'coupon_content cant registore'}, status: :bad_request  and return
         end
 
     end
 
     def update
 
-        # スタンプカードコンテントレコードの参照
-        exist_stampcard_content = current_api_v1_store.stampcard_content
+        # クーポンコンテントレコードの参照
+        exist_coupon_content = current_api_v1_store.coupon_contents.find_by_id(params[:id])
 
-        # スタンプカードコンテンツレコードが存在するかどうかの確認
-        if exist_stampcard_content.nil?
-            render json: {error: 'stampcard_content was not exist'}, status: :bad_request and return
+        # クーポンコンテンツレコードが存在するかどうかの確認
+        if exist_coupon_content.nil?
+            render json: {error: 'coupon_content was not exist'}, status: :bad_request and return
         end
 
-        # スタンプカードコンテンツレコードが更新できたかの確認
-        if exist_stampcard_content.update(update_stampcard_contents_params)
-            render json: exist_stampcard_content, status: :ok and return
+        # クーポンコンテンツレコードが更新できたかの確認
+        if exist_coupon_content.update(update_coupon_contents_params)
+            render json: exist_coupon_content, status: :ok and return
         else 
-            render json: {error: 'stampcard_content cant update'}, status: :bad_request  and return
+            render json: {error: 'coupon_content cant update'}, status: :bad_request  and return
         end
 
     end
 
     def destroy
 
-        # スタンプカードコンテンツレコードを参照
-        exist_stampcard_content = current_api_v1_store.stampcard_content
+        # クーポンコンテンツレコードを参照
+        exist_coupon_content = current_api_v1_store.coupon_contents.find_by_id(params[:id])
 
-        # スタンプカードコンテンツレコードが存在するかの確認
-        unless exist_stampcard_content.present?
-            render json: { error: 'stampcard_content record not exist'}, status: :not_found and return 
+        # クーポンコンテンツレコードが存在するかの確認
+        unless exist_coupon_content.present?
+            render json: { error: 'coupon_content record not exist'}, status: :not_found and return 
         end
 
-        #スタンプカードコンテンツレコードが削除できたかの確認
-        if exist_stampcard_content.destroy
-            render json: {message: "success to delete stampcard_contents record"}, status: :ok and return
+        # クーポンコンテンツレコードが削除できたかの確認
+        if exist_coupon_content.destroy
+            render json: {message: "success to delete coupon_contents record"}, status: :ok and return
         else  
-            render json: {error: 'stampcard_contents record cant destroy'}, status: :bad_request  and return
+            render json: {error: 'coupon_contents record cant destroy'}, status: :bad_request  and return
         end
 
     end
 
     private
 
-    def create_stampcard_contents_params
-        params.permit(:max_stamp_count, :add_stamp_count)
+    def create_coupon_contents_params
+        params.permit(:name, :required_stamp_count, :valid_day)
     end
 
-    def update_stampcard_contents_params
-        params.permit(:max_stamp_count, :add_stamp_count)
+    def update_coupon_contents_params
+        params.permit(:name, :required_stamp_count, :valid_day)
     end
     
 end

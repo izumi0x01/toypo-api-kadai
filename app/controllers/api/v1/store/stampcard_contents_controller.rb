@@ -62,7 +62,7 @@ class Api::V1::Store::StampcardContentsController < ApplicationController
         exist_stampcard_content = current_api_v1_store.stampcard_content
 
         # スタンプカードコンテンツレコードが存在するかの確認
-        if exist_stampcard_content.present?
+        unless exist_stampcard_content.present?
             render json: { error: 'stampcard_content record not exist'}, status: :not_found and return 
         end
 

@@ -5,22 +5,30 @@ class Api::V1::User::StampcardsController < ApplicationController
     def index
         
         #スタンプカードレコードを参照
-        extract_stampcard = current_api_v1_user.stampcards.find_by_id(params[:id])
+        extract_stampcards = current_api_v1_user.stampcards
 
         #スタンプカードレコードが存在するかの確認
-        unless extract_stampcard.present?
-            render json: {error: "stampcard record was not exist"}, status: :not_found and return
+        unless extract_stampcards.present?
+            render json: {error: "stampcard records were not exist"}, status: :not_found and return
         end
 
         #つながりのレコードの一覧を参照
         extract_connections = current_api_v1_user.connections
 
         #繋がりのレコードの中で，スタンプカードが参照している店舗と同じレコードを参照
-        connected_stampcard = extract_connections.where(user_id: extract_stampcard.stampcard_contents.store_id)  
+        associated_connection_with_stampcard_contents = extract_connections.where(store_id: StampcardContent.find_by_id(params[:stampcard_content_id]).store_id)
 
         #繋がっている店舗が発行しているスタンプカードかどうかの確認
-        if exist_stampcards.present?
-            render json: exist_stampcards, status: :ok and return
+        unless  associated_connection_with_stampcard_contents.present?
+            render json: {error: "these Stamp card records were not connected with stores yet"}, status: :not_found and return
+        end
+
+        #変数の入れ替え
+        connected_stampcards = extract_stampcards  
+
+        #繋がっている店舗が発行しているスタンプカードかどうかの確認
+        if connected_stampcards.present?
+            render json: connected_stampcards, status: :ok and return
         else
             render json: {error: "record was not exist"}, status: :not_found and return
         end
@@ -41,7 +49,15 @@ class Api::V1::User::StampcardsController < ApplicationController
         extract_connections = current_api_v1_user.connections
 
         #繋がりのレコードの中で，スタンプカードが参照している店舗と同じレコードを参照
-        connected_stampcard = extract_connections.find_by(user_id: extract_stampcard.stampcard_contents.store_id)           
+        associated_connection_with_stampcard_content = extract_connections.find_by(store_id: StampcardContent.find_by_id(params[:stampcard_content_id]).store_id)
+
+        #繋がっている店舗が発行しているスタンプカードかどうかの確認
+        unless  associated_connection_with_stampcard_content.present?
+            render json: {error: "this Stamp card record was not connected with store yet"}, status: :not_found and return
+        end
+
+        #変数の入れ替え
+        connected_stampcard = extract_stampcard      
 
         #繋がっている店舗が発行しているスタンプカードかどうかの確認
         if connected_stampcard.present?
@@ -55,35 +71,35 @@ class Api::V1::User::StampcardsController < ApplicationController
     def create
 
         #スタンプカードコンテンツレコードの参照
-        exist_stampcard = StampcardContent.find_by_id(stampcards_create_params)
+        extract_stampcard_content = StampcardContent.find_by_id(params[:stampcard_content_id])
 
-        #スタンプカードレコードが存在するかどうかの確認
-        unless exist_stampcard
+        #スタンプカードコンテンツレコードが存在するかどうかの確認
+        unless extract_stampcard_content.present?
             render json: {error: 'stampcard_content record cant find'}, status: :not_found
             return
         end 
-
-        #スタンプカードレコードを参照
-        exist_stampcards = current_api_v1_user.stampcards
-        
-        #存在するスタンプカードのスタンプカードコンテンツidが重複すれば，はねる
-        if exist_stampcards.find_by(stampcards_create_params)
-            render json: {error: 'this kind of stampcard was already registored'}, status: :bad_request and return
-        end
 
         #つながりのレコードの一覧を参照
         extract_connections = current_api_v1_user.connections
 
         #繋がりのレコードの中で，スタンプカードが参照している店舗と同じレコードを参照
-        connected_stampcard = extract_connections.find_by(user_id: extract_stampcard.stampcard_contents.store_id)
+        associated_connection_with_stampcard_content = extract_connections.find_by(store_id: StampcardContent.find_by_id(params[:stampcard_content_id]).store_id)
 
         #繋がっている店舗が発行しているスタンプカードかどうかの確認
-        unless connected_stampcard.present?
+        unless  associated_connection_with_stampcard_content.present?
             render json: {error: "this Stamp card record was not connected with store yet"}, status: :not_found and return
         end
 
+        #スタンプカードレコードを参照
+        exist_stampcard = current_api_v1_user.stampcards.find_by(create_stampcards_params)
+
+        #存在するスタンプカードのスタンプカードコンテンツidが重複すれば，はねる
+        if exist_stampcard.present?
+            render json: {error: 'this kind of stampcard was already registored'}, status: :bad_request and return
+        end
+
         #スタンプカードレコードを作成
-        new_stampcard = current_api_v1_user.stampcards.new(stampcards_create_params)
+        new_stampcard = current_api_v1_user.stampcards.new(create_stampcards_params)
         new_stampcard.stamp_count = 0
 
         #スタンプカードレコードが登録できたかの確認
@@ -109,12 +125,15 @@ class Api::V1::User::StampcardsController < ApplicationController
         extract_connections = current_api_v1_user.connections
 
         #繋がりのレコードの中で，スタンプカードが参照している店舗と同じレコードを参照
-        connected_stampcard = extract_connections.find_by(user_id: extract_stampcard.stampcard_contents.store_id)           
-        
-        # 取り出したスタンプカードが繋がっている店舗のものかどうかの確認
-        unless connected_stampcard.present?
+        associated_connection_with_stampcard_content = extract_connections.find_by(store_id: StampcardContent.find_by_id(params[:stampcard_content_id]).store_id)
+
+        #繋がっている店舗が発行しているスタンプカードかどうかの確認
+        unless  associated_connection_with_stampcard_content.present?
             render json: {error: "this Stamp card record was not connected with store yet"}, status: :not_found and return
         end
+
+        #変数の入れ替え
+        connected_stampcard = extract_stampcard
 
         #スタンプカードにスタンプを押す
         connected_stampcard.stamp_count += connected_stampcard.stampcard_content.add_stamp_count
@@ -134,6 +153,7 @@ class Api::V1::User::StampcardsController < ApplicationController
     end  
 
     def destroy
+
         #スタンプカードレコードを参照
         extract_stampcard = current_api_v1_user.stampcards.find_by_id(params[:id])
 
@@ -146,15 +166,18 @@ class Api::V1::User::StampcardsController < ApplicationController
         extract_connections = current_api_v1_user.connections
 
         #繋がりのレコードの中で，スタンプカードが参照している店舗と同じレコードを参照
-        connected_stampcard = extract_connections.find_by(user_id: extract_stampcard.stampcard_contents.store_id)           
-        
-        # 取り出したスタンプカードが繋がっている店舗のものかどうかの確認
-        unless connected_stampcard.present?
+        associated_connection_with_stampcard_content = extract_connections.find_by(store_id: StampcardContent.find_by_id(params[:stampcard_content_id]).store_id)
+
+        #繋がっている店舗が発行しているスタンプカードかどうかの確認
+        unless  associated_connection_with_stampcard_content.present?
             render json: {error: "this Stamp card record was not connected with store yet"}, status: :not_found and return
         end
 
+        #変数の入れ替え
+        connected_stampcard = extract_stampcard
+
         #スタンプカードレコードが削除できたかの確認
-        if extract_stampcard.destroy
+        if connected_stampcard.destroy
             render json: {message: "success to delete stampcard record"}, status: :ok and return
         else 
             render json: {error: 'stampcard record cant destroy'}, status: :bad_request  and return
@@ -164,7 +187,11 @@ class Api::V1::User::StampcardsController < ApplicationController
 
     private
 
-    def stampcards_create_params
+    def create_stampcards_params
+        params.permit(:stampcard_content_id)
+    end
+
+    def update_stampcards_params
         params.permit(:stampcard_content_id)
     end
     

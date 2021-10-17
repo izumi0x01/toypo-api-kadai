@@ -22,6 +22,7 @@ Rails.application.routes.draw do
       namespace :store do
         resources :connections, only: [:create, :destroy, :show, :index]
         resource :stampcard_contents
+        resources :coupon_contents
       end
 
 

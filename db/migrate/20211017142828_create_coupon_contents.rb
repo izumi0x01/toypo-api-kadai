@@ -2,6 +2,11 @@ class CreateCouponContents < ActiveRecord::Migration[5.2]
   def change
     create_table :coupon_contents do |t|
 
+      t.references :store, null: false, index: true, foreign_key: true
+      t.integer :name, null: false
+      t.integer :required_stamp_count, null: false
+      t.integer :valid_day
+
       t.timestamps
     end
   end

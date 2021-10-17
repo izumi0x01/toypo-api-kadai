@@ -30,6 +30,11 @@ class Api::V1::User::StampcardsController < ApplicationController
                 next 
             end
 
+            #スタンプが上限数を超えていないかの確認
+            if extract_stampcard.stamp_count >= extract_stampcard.stampcard_content.max_stamp_count
+                extract_stampcard.stamp_count = extract_stampcard.stampcard_content.max_stamp_count
+            end
+
             connected_stampcards.append(extract_stampcard)
             
         end
@@ -68,7 +73,12 @@ class Api::V1::User::StampcardsController < ApplicationController
         end
 
         #変数の入れ替え
-        connected_stampcard = extract_stampcard      
+        connected_stampcard = extract_stampcard    
+        
+        #スタンプが上限数を超えていないかの確認
+        if connected_stampcard.stamp_count >= connected_stampcard.stampcard_content.max_stamp_count
+            connected_stampcard.stamp_count = connected_stampcard.stampcard_content.max_stamp_count
+        end
 
         #繋がっている店舗が発行しているスタンプカードかどうかの確認
         if connected_stampcard.present?
@@ -153,12 +163,16 @@ class Api::V1::User::StampcardsController < ApplicationController
         connected_stampcard = extract_stampcard
 
         #スタンプカードにスタンプを押す
-        connected_stampcard.stamp_count += connected_stampcard.stampcard_content.add_stamp_count
-
-        #スタンプが上限数を超えていないかの確認
-        if connected_stampcard.stamp_count > connected_stampcard.stampcard_content.max_stamp_count
-            render json: {error: 'stamp maximum count has been exceeded'}, status: :bad_request  and return
+        if  (connected_stampcard.stampcard_content.max_stamp_count - connected_stampcard.stamp_count) < connected_stampcard.stampcard_content.add_stamp_count
+            connected_stampcard.stamp_count = connected_stampcard.stampcard_content.max_stamp_count
+        else
+            connected_stampcard.stamp_count += connected_stampcard.stampcard_content.add_stamp_count
         end
+        
+        # #スタンプが上限数を超えていないかの確認
+        # if connected_stampcard.stamp_count > connected_stampcard.stampcard_content.max_stamp_count
+        #     render json: {error: 'stamp maximum count has been exceeded'}, status: :bad_request  and return
+        # end
         
         #スタンプカードレコードを更新できたかの確認
         if connected_stampcard.save

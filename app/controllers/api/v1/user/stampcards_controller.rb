@@ -15,16 +15,24 @@ class Api::V1::User::StampcardsController < ApplicationController
         #つながりのレコードの一覧を参照
         extract_connections = current_api_v1_user.connections
 
-        #繋がりのレコードの中で，スタンプカードが参照している店舗と同じレコードを参照
-        associated_connection_with_stampcard_contents = extract_connections.where(store_id: StampcardContent.find_by_id(params[:stampcard_content_id]).store_id)
+        # 変数の初期化
+        connected_stampcards = []
 
-        #繋がっている店舗が発行しているスタンプカードかどうかの確認
-        unless  associated_connection_with_stampcard_contents.present?
-            render json: {error: "these Stamp card records were not connected with stores yet"}, status: :not_found and return
+        extract_stampcards.each do |extract_stampcard|
+
+            #スタンプカードが参照しているスタンプカードコンテントの店舗IDを取得
+            store_id_depend_with_stampcard_content = StampcardContent.find_by_id(extract_stampcard.stampcard_content_id).store_id
+            
+            # 繋がりのレコードの店舗IDと同じとなる，スタンプカードコンテントのレコードを取得
+            associated_connection_with_stampcard_content = extract_connections.find_by(store_id: store_id_depend_with_stampcard_content)
+
+            unless associated_connection_with_stampcard_content.present?
+                next 
+            end
+
+            connected_stampcards.append(extract_stampcard)
+            
         end
-
-        #変数の入れ替え
-        connected_stampcards = extract_stampcards  
 
         #繋がっている店舗が発行しているスタンプカードかどうかの確認
         if connected_stampcards.present?
@@ -48,8 +56,11 @@ class Api::V1::User::StampcardsController < ApplicationController
         #つながりのレコードの一覧を参照
         extract_connections = current_api_v1_user.connections
 
-        #繋がりのレコードの中で，スタンプカードが参照している店舗と同じレコードを参照
-        associated_connection_with_stampcard_content = extract_connections.find_by(store_id: StampcardContent.find_by_id(params[:stampcard_content_id]).store_id)
+        #スタンプカードが参照しているスタンプカードコンテントの店舗IDを取得
+        store_id_depend_with_stampcard_content = StampcardContent.find_by_id(extract_stampcard.stampcard_content_id).store_id
+        
+        # 繋がりのレコードの店舗IDと同じとなる，スタンプカードコンテントのレコードを取得
+        associated_connection_with_stampcard_content = extract_connections.find_by(store_id: store_id_depend_with_stampcard_content)
 
         #繋がっている店舗が発行しているスタンプカードかどうかの確認
         unless  associated_connection_with_stampcard_content.present?
@@ -82,8 +93,11 @@ class Api::V1::User::StampcardsController < ApplicationController
         #つながりのレコードの一覧を参照
         extract_connections = current_api_v1_user.connections
 
-        #繋がりのレコードの中で，スタンプカードが参照している店舗と同じレコードを参照
-        associated_connection_with_stampcard_content = extract_connections.find_by(store_id: StampcardContent.find_by_id(params[:stampcard_content_id]).store_id)
+        # スタンプカードが参照している店舗IDを参照
+        store_id_depend_with_stampcard_content = StampcardContent.find_by_id(params[:stampcard_content_id]).store_id
+
+        #繋がりのレコードの店舗IDと同じとなる，スタンプカードコンテントのレコードを取得
+        associated_connection_with_stampcard_content = extract_connections.find_by(store_id: store_id_depend_with_stampcard_content)
 
         #繋がっている店舗が発行しているスタンプカードかどうかの確認
         unless  associated_connection_with_stampcard_content.present?
@@ -124,8 +138,11 @@ class Api::V1::User::StampcardsController < ApplicationController
         #つながりのレコードの一覧を参照
         extract_connections = current_api_v1_user.connections
 
-        #繋がりのレコードの中で，スタンプカードが参照している店舗と同じレコードを参照
-        associated_connection_with_stampcard_content = extract_connections.find_by(store_id: StampcardContent.find_by_id(params[:stampcard_content_id]).store_id)
+        #スタンプカードが参照しているスタンプカードコンテントの店舗IDを取得
+        store_id_depend_with_stampcard_content = StampcardContent.find_by_id(extract_stampcard.stampcard_content_id).store_id
+        
+        # 繋がりのレコードの店舗IDと同じとなる，スタンプカードコンテントのレコードを取得
+        associated_connection_with_stampcard_content = extract_connections.find_by(store_id: store_id_depend_with_stampcard_content)
 
         #繋がっている店舗が発行しているスタンプカードかどうかの確認
         unless  associated_connection_with_stampcard_content.present?
@@ -165,8 +182,11 @@ class Api::V1::User::StampcardsController < ApplicationController
         #つながりのレコードの一覧を参照
         extract_connections = current_api_v1_user.connections
 
-        #繋がりのレコードの中で，スタンプカードが参照している店舗と同じレコードを参照
-        associated_connection_with_stampcard_content = extract_connections.find_by(store_id: StampcardContent.find_by_id(params[:stampcard_content_id]).store_id)
+        #スタンプカードが参照しているスタンプカードコンテントの店舗IDを取得
+        store_id_depend_with_stampcard_content = StampcardContent.find_by_id(extract_stampcard.stampcard_content_id).store_id
+        
+        # 繋がりのレコードの店舗IDと同じとなる，スタンプカードコンテントのレコードを取得
+        associated_connection_with_stampcard_content = extract_connections.find_by(store_id: store_id_depend_with_stampcard_content)
 
         #繋がっている店舗が発行しているスタンプカードかどうかの確認
         unless  associated_connection_with_stampcard_content.present?
@@ -188,10 +208,6 @@ class Api::V1::User::StampcardsController < ApplicationController
     private
 
     def create_stampcards_params
-        params.permit(:stampcard_content_id)
-    end
-
-    def update_stampcards_params
         params.permit(:stampcard_content_id)
     end
     

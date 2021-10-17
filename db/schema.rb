@@ -24,16 +24,16 @@ ActiveRecord::Schema.define(version: 2021_09_28_071827) do
   end
 
   create_table "stampcard_contents", force: :cascade do |t|
-    t.bigint "store_id"
-    t.integer "add_stamp_count"
-    t.integer "max_stamp_count"
+    t.bigint "store_id", null: false
+    t.integer "add_stamp_count", null: false
+    t.integer "max_stamp_count", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["store_id"], name: "index_stampcard_contents_on_store_id"
   end
 
   create_table "stampcards", force: :cascade do |t|
-    t.bigint "user_id"
+    t.bigint "user_id", null: false
     t.bigint "stampcard_content_id"
     t.integer "stamp_count"
     t.datetime "created_at", null: false

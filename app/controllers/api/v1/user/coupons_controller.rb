@@ -1,16 +1,19 @@
 class CouponsController < ApplicationController
 
+    # いもくさいことをやめよう
+    # スライド作ろう
+    # couch if を作ろう
+    # DB設計がまずいのでは
+
     before_action :authenticate_api_v1_user!
 
     def index
         
         #スタンプカードレコードを参照
-        extract_stampcards = current_api_v1_user.stampcards
+        extract_coupons = current_api_v1_user.stampcards
 
         #スタンプカードレコードが存在するかの確認
-        unless extract_stampcards.present?
-            render json: {error: "stampcard records were not exist"}, status: :not_found and return
-        end
+        render json: {error: "stampcard records were not exist"}, status: :not_found and return if extract_coupons
 
         #つながりのレコードの一覧を参照
         extract_connections = current_api_v1_user.connections
@@ -50,42 +53,45 @@ class CouponsController < ApplicationController
     
     def show
 
-        #スタンプカードレコードを参照
-        extract_stampcard = current_api_v1_user.stampcards.find_by_id(params[:id])
+        # DBからクーポンカードを参照
+        extract_coupon = current_api_v1_user.coupons.find_by_id(params[:id])
 
-        #スタンプカードレコードが存在するかの確認
-        unless extract_stampcard.present?
-            render json: {error: "stampcard record was not exist"}, status: :not_found and return
-        end
+        # スタンプカードレコードが存在するかの確認
+        render json: {error: "stampcard record was not exist"}, status: :not_found and return unless extract_stampcard.present?
+
+
+        # ここから
 
         #つながりのレコードの一覧を参照
-        extract_connections = current_api_v1_user.connections
+        # extract_connections = current_api_v1_user.connections
 
-        #スタンプカードが参照しているスタンプカードコンテントの店舗IDを取得
-        store_id_depend_with_stampcard_content = StampcardContent.find_by_id(extract_stampcard.stampcard_content_id).store_id
+        # #スタンプカードが参照しているスタンプカードコンテントの店舗IDを取得
+        # store_id_depend_with_stampcard_content = StampcardContent.find_by_id(extract_stampcard.stampcard_content_id).store_id
         
-        # 繋がりのレコードの店舗IDと同じとなる，スタンプカードコンテントのレコードを取得
-        associated_connection_with_stampcard_content = extract_connections.find_by(store_id: store_id_depend_with_stampcard_content)
+        # # 繋がりのレコードの店舗IDと同じとなる，スタンプカードコンテントのレコードを取得
+        # associated_connection_with_stampcard_content = extract_connections.find_by(store_id: store_id_depend_with_stampcard_content)
 
-        #繋がっている店舗が発行しているスタンプカードかどうかの確認
-        unless  associated_connection_with_stampcard_content.present?
-            render json: {error: "this Stamp card record was not connected with store yet"}, status: :not_found and return
-        end
+        # #繋がっている店舗が発行しているスタンプカードかどうかの確認
+        # unless  associated_connection_with_stampcard_content.present?
+        #     render json: {error: "this Stamp card record was not connected with store yet"}, status: :not_found and return
+        # end
 
-        #変数の入れ替え
-        connected_stampcard = extract_stampcard    
+        # #変数の入れ替え
+        # connected_stampcard = extract_stampcard    
+
+        # ここまで
         
-        #スタンプが上限数を超えていないかの確認
-        if connected_stampcard.stamp_count >= connected_stampcard.stampcard_content.max_stamp_count
-            connected_stampcard.stamp_count = connected_stampcard.stampcard_content.max_stamp_count
-        end
+        # #スタンプが上限数を超えていないかの確認
+        # if connected_stampcard.stamp_count >= connected_stampcard.stampcard_content.max_stamp_count
+        #     connected_stampcard.stamp_count = connected_stampcard.stampcard_content.max_stamp_count
+        # end
 
-        #繋がっている店舗が発行しているスタンプカードかどうかの確認
-        if connected_stampcard.present?
-            render json: connected_stampcard, status: :ok and return
-        else
-            render json: {error: "this Stamp card record was not connected with store yet"}, status: :not_found and return
-        end
+        # #繋がっている店舗が発行しているスタンプカードかどうかの確認
+        # if connected_stampcard.present?
+        #     render json: connected_stampcard, status: :ok and return
+        # else
+        #     render json: {error: "this Stamp card record was not connected with store yet"}, status: :not_found and return
+        # end
         
     end
 

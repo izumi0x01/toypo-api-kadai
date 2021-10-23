@@ -8,6 +8,9 @@ class User < ActiveRecord::Base
   #stampcardの関連付け
   has_many :stampcards,  dependent: :destroy
 
+    #couponの関連付け
+    has_many :copons,  dependent: :destroy
+
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,

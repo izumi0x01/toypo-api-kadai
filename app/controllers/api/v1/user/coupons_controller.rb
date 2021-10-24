@@ -1,4 +1,4 @@
-class CouponsController < ApplicationController
+class  Api::V1::User::CouponsController < ApplicationController
 
     # いもくさいことをやめよう
     # スライド作ろう
@@ -53,15 +53,17 @@ class CouponsController < ApplicationController
     
     def show
 
-        # DBからクーポンカードを参照
-        extract_coupon = current_api_v1_user.coupons.find_by_id(params[:id])
+        # # DBからクーポンカードを参照
+        # extract_coupon = current_api_v1_user.coupons.find_by_id(params[:id])
 
-        # スタンプカードレコードが存在するかの確認
-        render json: {error: "stampcard record was not exist"}, status: :not_found and return unless extract_stampcard.present?
+        # # スタンプカードレコードが存在するかの確認
+        # render json: {error: "stampcard record was not exist"}, status: :not_found and return unless extract_stampcard.present?
 
+        # # つながりの一覧を持ってくる
+        # extract_connections = current_api_v1_user.connections
+        # # ここから
 
-        # ここから
-
+        # store_id = 
         #つながりのレコードの一覧を参照
         # extract_connections = current_api_v1_user.connections
 
@@ -100,40 +102,29 @@ class CouponsController < ApplicationController
         #スタンプカードコンテンツレコードの参照
         extract_stampcard_content = StampcardContent.find_by_id(params[:stampcard_content_id])
 
-        #スタンプカードコンテンツレコードが存在するかどうかの確認
-        unless extract_stampcard_content.present?
-            render json: {error: 'stampcard_content record cant find'}, status: :not_found
-            return
-        end 
+        #スタンプカードコンテンツレコードが存在するかどうかの確認 
+        render json: {error: 'stampcard_content record cant find'}, status: :not_found and return unless extract_stampcard_content.present?
 
+        # スタンプカードが参照している店舗ID
+        refered_store_id = StampcardContent.find_by_id(params[:stampcard_content_id]).store_id
+        
         #つながりのレコードの一覧を参照
-        extract_connections = current_api_v1_user.connections
-
-        # スタンプカードが参照している店舗IDを参照
-        store_id_depend_with_stampcard_content = StampcardContent.find_by_id(params[:stampcard_content_id]).store_id
-
-        #繋がりのレコードの店舗IDと同じとなる，スタンプカードコンテントのレコードを取得
-        associated_connection_with_stampcard_content = extract_connections.find_by(store_id: store_id_depend_with_stampcard_content)
-
-        #繋がっている店舗が発行しているスタンプカードかどうかの確認
-        unless  associated_connection_with_stampcard_content.present?
+        if current_api_v1_user.connections.store_id.include(refered_store_id)
             render json: {error: "this Stamp card record was not connected with store yet"}, status: :not_found and return
-        end
+        end 
 
         #スタンプカードレコードを参照
         exist_stampcard = current_api_v1_user.stampcards.find_by(create_stampcards_params)
 
         #存在するスタンプカードのスタンプカードコンテンツidが重複すれば，はねる
-        if exist_stampcard.present?
-            render json: {error: 'this kind of stampcard was already registored'}, status: :bad_request and return
-        end
+        render json: {error: 'this kind of stampcard was already registored'}, status: :bad_request and return if exist_stampcard.present?
 
         #スタンプカードレコードを作成
         new_stampcard = current_api_v1_user.stampcards.new(create_stampcards_params)
         new_stampcard.stamp_count = 0
 
         #スタンプカードレコードが登録できたかの確認
-        if new_stampcard.save
+        if new_stampcard.save 
             render json: new_stampcard, status: :ok and return
         else 
             render json: {error: 'stampcard record cant registore'}, status: :bad_request and return

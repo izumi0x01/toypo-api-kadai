@@ -5,5 +5,8 @@ class StampcardContent < ActiveRecord::Base
 
     #stampcardとの関連付け
     has_many :stampcards, dependent: :destroy
+
+    #coupon_contentとの関連付け
+    has_many :coupon_contents, dependent: :destroy
     
 end

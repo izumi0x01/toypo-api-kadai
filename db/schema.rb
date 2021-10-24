@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_09_28_071827) do
+ActiveRecord::Schema.define(version: 2021_10_17_145827) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -21,6 +21,28 @@ ActiveRecord::Schema.define(version: 2021_09_28_071827) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id", "store_id"], name: "index_connections_on_user_id_and_store_id", unique: true
+  end
+
+  create_table "coupon_contents", force: :cascade do |t|
+    t.bigint "store_id", null: false
+    t.bigint "stampcard_content_id", null: false
+    t.string "name", null: false
+    t.integer "required_stamp_count", null: false
+    t.integer "valid_day", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["stampcard_content_id"], name: "index_coupon_contents_on_stampcard_content_id"
+    t.index ["store_id"], name: "index_coupon_contents_on_store_id"
+  end
+
+  create_table "coupons", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "coupon_content_id", null: false
+    t.datetime "expiration_date", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["coupon_content_id"], name: "index_coupons_on_coupon_content_id"
+    t.index ["user_id"], name: "index_coupons_on_user_id"
   end
 
   create_table "stampcard_contents", force: :cascade do |t|
@@ -83,6 +105,10 @@ ActiveRecord::Schema.define(version: 2021_09_28_071827) do
     t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
   end
 
+  add_foreign_key "coupon_contents", "stampcard_contents"
+  add_foreign_key "coupon_contents", "stores"
+  add_foreign_key "coupons", "coupon_contents"
+  add_foreign_key "coupons", "users"
   add_foreign_key "stampcard_contents", "stores"
   add_foreign_key "stampcards", "stampcard_contents"
   add_foreign_key "stampcards", "users"

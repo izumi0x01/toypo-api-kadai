@@ -1,3 +1,5 @@
+require "date"
+
 class  Api::V1::User::CouponsController < ApplicationController
 
     # いもくさいことをやめよう
@@ -9,123 +11,72 @@ class  Api::V1::User::CouponsController < ApplicationController
 
     def index
         
-        #スタンプカードレコードを参照
-        extract_coupons = current_api_v1_user.stampcards
+        #クーポンレコードを参照
+        exist_coupons = current_api_v1_user.coupons
 
-        #スタンプカードレコードが存在するかの確認
-        render json: {error: "stampcard records were not exist"}, status: :not_found and return if extract_coupons
-
-        #つながりのレコードの一覧を参照
-        extract_connections = current_api_v1_user.connections
-
-        # 変数の初期化
-        connected_stampcards = []
-
-        extract_stampcards.each do |extract_stampcard|
-
-            #スタンプカードが参照しているスタンプカードコンテントの店舗IDを取得
-            store_id_depend_with_stampcard_content = StampcardContent.find_by_id(extract_stampcard.stampcard_content_id).store_id
-            
-            # 繋がりのレコードの店舗IDと同じとなる，スタンプカードコンテントのレコードを取得
-            associated_connection_with_stampcard_content = extract_connections.find_by(store_id: store_id_depend_with_stampcard_content)
-
-            unless associated_connection_with_stampcard_content.present?
-                next 
-            end
-
-            #スタンプが上限数を超えていないかの確認
-            if extract_stampcard.stamp_count >= extract_stampcard.stampcard_content.max_stamp_count
-                extract_stampcard.stamp_count = extract_stampcard.stampcard_content.max_stamp_count
-            end
-
-            connected_stampcards.append(extract_stampcard)
-            
-        end
-
-        #繋がっている店舗が発行しているスタンプカードかどうかの確認
-        if connected_stampcards.present?
-            render json: connected_stampcards, status: :ok and return
+        #クーポンレコードの一覧をレスポンスに渡すことができたかどうかの確認
+        if exist_coupons.present?
+            render json: exist_coupons, status: :ok and return
         else
-            render json: {error: "record was not exist"}, status: :not_found and return
+            render json: {error: "record was not exist"} , status: :not_found and return
         end
 
     end
     
     def show
 
-        # # DBからクーポンカードを参照
-        # extract_coupon = current_api_v1_user.coupons.find_by_id(params[:id])
+        #クーポンレコードの参照
+        extract_coupon = current_api_v1_user.coupons.find_by_id(params[:id])
 
-        # # スタンプカードレコードが存在するかの確認
-        # render json: {error: "stampcard record was not exist"}, status: :not_found and return unless extract_stampcard.present?
-
-        # # つながりの一覧を持ってくる
-        # extract_connections = current_api_v1_user.connections
-        # # ここから
-
-        # store_id = 
-        #つながりのレコードの一覧を参照
-        # extract_connections = current_api_v1_user.connections
-
-        # #スタンプカードが参照しているスタンプカードコンテントの店舗IDを取得
-        # store_id_depend_with_stampcard_content = StampcardContent.find_by_id(extract_stampcard.stampcard_content_id).store_id
-        
-        # # 繋がりのレコードの店舗IDと同じとなる，スタンプカードコンテントのレコードを取得
-        # associated_connection_with_stampcard_content = extract_connections.find_by(store_id: store_id_depend_with_stampcard_content)
-
-        # #繋がっている店舗が発行しているスタンプカードかどうかの確認
-        # unless  associated_connection_with_stampcard_content.present?
-        #     render json: {error: "this Stamp card record was not connected with store yet"}, status: :not_found and return
-        # end
-
-        # #変数の入れ替え
-        # connected_stampcard = extract_stampcard    
-
-        # ここまで
-        
-        # #スタンプが上限数を超えていないかの確認
-        # if connected_stampcard.stamp_count >= connected_stampcard.stampcard_content.max_stamp_count
-        #     connected_stampcard.stamp_count = connected_stampcard.stampcard_content.max_stamp_count
-        # end
-
-        # #繋がっている店舗が発行しているスタンプカードかどうかの確認
-        # if connected_stampcard.present?
-        #     render json: connected_stampcard, status: :ok and return
-        # else
-        #     render json: {error: "this Stamp card record was not connected with store yet"}, status: :not_found and return
-        # end
+        #クーポン情報が返せたかどうかの確認
+        if extract_coupon.present?
+            render json: extract_coupon, status: :ok and return
+        else
+            render json: {error: "record was not exist"}, status: :not_found and return
+        end
         
     end
 
     def create
 
-        #スタンプカードコンテンツレコードの参照
-        extract_stampcard_content = StampcardContent.find_by_id(params[:stampcard_content_id])
+        #クーポンコンテンツレコードの参照
+        extract_coupon_content = CouponContent.find_by_id(params[:coupon_content_id])
 
-        #スタンプカードコンテンツレコードが存在するかどうかの確認 
-        render json: {error: 'stampcard_content record cant find'}, status: :not_found and return unless extract_stampcard_content.present?
+        #クーポンカードコンテンツレコードが存在するかどうかの確認 
+        render json: {error: 'coupon_content record cant find'}, status: :not_found and return unless extract_coupon_content.present?
 
-        # スタンプカードが参照している店舗ID
-        refered_store_id = StampcardContent.find_by_id(params[:stampcard_content_id]).store_id
+        #スタンプカードレコードの参照
+        extract_stampcard = Stampcard.find_by_id(params[:stampcard_id])
         
-        #つながりのレコードの一覧を参照
-        if current_api_v1_user.connections.store_id.include(refered_store_id)
+        #スタンプカードレコードが存在するかどうかの確認 
+        render json: {error: 'stampcard record cant find'}, status: :not_found and return unless extract_stampcard.present?
+        
+        #つながっているかの確認
+        store_ids=[]
+        current_api_v1_user.stores do |store|
+            store_ids.append(store.id)
+        end
+        
+        #つながっているかの確認
+        if store_ids.include?(extract_coupon_content.store_id)
             render json: {error: "this Stamp card record was not connected with store yet"}, status: :not_found and return
         end 
 
-        #スタンプカードレコードを参照
-        exist_stampcard = current_api_v1_user.stampcards.find_by(create_stampcards_params)
 
-        #存在するスタンプカードのスタンプカードコンテンツidが重複すれば，はねる
-        render json: {error: 'this kind of stampcard was already registored'}, status: :bad_request and return if exist_stampcard.present?
+        #クーポン発行時にスタンプが所望の値に到達しているかの確認
+        render json: {error: "Not enough stamps"}, status: :not_found and return if extract_coupon_content.required_stamp_count > extract_stampcard.stamp_count
 
-        #スタンプカードレコードを作成
-        new_stampcard = current_api_v1_user.stampcards.new(create_stampcards_params)
-        new_stampcard.stamp_count = 0
+        #クーポンレコードを作成
+        new_coupon = current_api_v1_user.coupons.new(create_coupons_params)
+
+        #有効期限を設定
+        now = DateTime.now
+        now += extract_coupon_content.valid_day
+        new_coupon.expiration_date = now
 
         #スタンプカードレコードが登録できたかの確認
-        if new_stampcard.save 
-            render json: new_stampcard, status: :ok and return
+        if new_coupon.save 
+            render json: new_coupon, status: :ok and return
         else 
             render json: {error: 'stampcard record cant registore'}, status: :bad_request and return
         end
@@ -134,92 +85,80 @@ class  Api::V1::User::CouponsController < ApplicationController
 
     def update
 
-        #スタンプカードレコードを参照
-        extract_stampcard = current_api_v1_user.stampcards.find_by_id(params[:id])
+        #クーポンレコードの参照
+        extract_coupon = current_api_v1_user.coupons.find_by_id(params[:id])
 
-        #スタンプカードレコードが存在するかの確認
-        unless extract_stampcard.present?
-            render json: {error: "stampcard record was not exist"}, status: :not_found and return
+        #クーポンカードコンテンツレコードが存在するかどうかの確認 
+        render json: {error: 'coupon_content record cant find'}, status: :not_found and return unless extract_coupon.present?
+
+        #つながっているかの確認
+        store_ids=[]
+        current_api_v1_user.stores do |store|
+            store_ids.append(store.id)
         end
-
-        #つながりのレコードの一覧を参照
-        extract_connections = current_api_v1_user.connections
-
-        #スタンプカードが参照しているスタンプカードコンテントの店舗IDを取得
-        store_id_depend_with_stampcard_content = StampcardContent.find_by_id(extract_stampcard.stampcard_content_id).store_id
         
-        # 繋がりのレコードの店舗IDと同じとなる，スタンプカードコンテントのレコードを取得
-        associated_connection_with_stampcard_content = extract_connections.find_by(store_id: store_id_depend_with_stampcard_content)
-
-        #繋がっている店舗が発行しているスタンプカードかどうかの確認
-        unless  associated_connection_with_stampcard_content.present?
+        #つながっているかの確認
+        if store_ids.include?(extract_coupon.coupon_content.store_id)
             render json: {error: "this Stamp card record was not connected with store yet"}, status: :not_found and return
+        end 
+        
+        #有効期限を設定
+        extract_coupon.expiration_date += (params[:change_valid_day]).to_i.days
+
+        if extract_coupon.expiration_date < DateTime.now
+            render json: {error: "the date must be set after today"}, status: :not_found and return
         end
 
-        #変数の入れ替え
-        connected_stampcard = extract_stampcard
-
-        #スタンプカードにスタンプを押す
-        if  (connected_stampcard.stampcard_content.max_stamp_count - connected_stampcard.stamp_count) < connected_stampcard.stampcard_content.add_stamp_count
-            connected_stampcard.stamp_count = connected_stampcard.stampcard_content.max_stamp_count
-        else
-            connected_stampcard.stamp_count += connected_stampcard.stampcard_content.add_stamp_count
-        end
-        
-        # #スタンプが上限数を超えていないかの確認
-        # if connected_stampcard.stamp_count > connected_stampcard.stampcard_content.max_stamp_count
-        #     render json: {error: 'stamp maximum count has been exceeded'}, status: :bad_request  and return
-        # end
-        
         #スタンプカードレコードを更新できたかの確認
-        if connected_stampcard.save
-            render json: connected_stampcard, status: :ok and return             
+        if extract_coupon.save
+            render json: extract_coupon, status: :ok and return             
         else
-            render json: {error: 'stampcard recored cant update'}, status: :bad_request and return
+            render json: {error: 'extract_coupon recored cant update'}, status: :bad_request and return
         end
 
     end  
 
     def destroy
 
-        #スタンプカードレコードを参照
-        extract_stampcard = current_api_v1_user.stampcards.find_by_id(params[:id])
+        #クーポンレコードの参照
+        extract_coupon = current_api_v1_user.coupons.find_by_id(params[:id])
 
-        #スタンプカードレコードが存在するかの確認
-        unless extract_stampcard.present?
-            render json: {error: "stampcard record was not exist"}, status: :not_found and return
+        #クーポンカードコンテンツレコードが存在するかどうかの確認 
+        render json: {error: 'coupon_content record cant find'}, status: :not_found and return unless extract_coupon.present?
+
+        #つながっているかの確認
+        store_ids=[]
+        current_api_v1_user.stores do |store|
+            store_ids.append(store.id)
         end
-
-        #つながりのレコードの一覧を参照
-        extract_connections = current_api_v1_user.connections
-
-        #スタンプカードが参照しているスタンプカードコンテントの店舗IDを取得
-        store_id_depend_with_stampcard_content = StampcardContent.find_by_id(extract_stampcard.stampcard_content_id).store_id
         
-        # 繋がりのレコードの店舗IDと同じとなる，スタンプカードコンテントのレコードを取得
-        associated_connection_with_stampcard_content = extract_connections.find_by(store_id: store_id_depend_with_stampcard_content)
-
-        #繋がっている店舗が発行しているスタンプカードかどうかの確認
-        unless  associated_connection_with_stampcard_content.present?
+        #つながっているかの確認
+        if store_ids.include?(extract_coupon.coupon_content.store_id)
             render json: {error: "this Stamp card record was not connected with store yet"}, status: :not_found and return
-        end
+        end 
 
-        #変数の入れ替え
-        connected_stampcard = extract_stampcard
+        #有効期限が切れていないかの確認
+        if extract_coupon.expiration_date < DateTime.now
+            render json: {error: "Cannot be used because the expiration date has expired"}, status: :not_found and return
+        end
 
         #スタンプカードレコードが削除できたかの確認
-        if connected_stampcard.destroy
-            render json: {message: "success to delete stampcard record"}, status: :ok and return
+        if extract_coupon.destroy
+            render json: {message: "success to delete coupon record"}, status: :ok and return
         else 
-            render json: {error: 'stampcard record cant destroy'}, status: :bad_request  and return
+            render json: {error: 'coupon record cant destroy'}, status: :bad_request  and return
         end
 
     end
 
     private
 
-    def create_stampcards_params
-        params.permit(:stampcard_content_id)
+    def create_coupons_params
+        params.permit(:coupon_content_id, :stampcard_id)
+    end
+
+    def update_coupons_params
+        params.permit(:coupon_content_id, :change_valid_day)
     end
     
 end

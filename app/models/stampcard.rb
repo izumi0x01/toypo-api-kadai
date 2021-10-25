@@ -6,4 +6,7 @@ class Stampcard < ApplicationRecord
     #stampcardcontentsとの関連付け
     belongs_to :stampcard_content
 
+    #couponとの関連付け
+    has_many :coupons
+
 end

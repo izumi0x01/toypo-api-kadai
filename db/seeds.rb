@@ -25,3 +25,10 @@
     )
   end
 
+  3.times do |n|
+    Connection.create!(
+      user_id: 1,
+      store_id: n + 1,
+    )
+  end
+

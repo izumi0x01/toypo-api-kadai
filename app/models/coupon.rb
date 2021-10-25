@@ -6,4 +6,7 @@ class Coupon < ApplicationRecord
     #couponcontentsとの関連付け
     belongs_to :coupon_content
 
+    #stampcardとの関連付け
+    belongs_to :stampcard
+
 end

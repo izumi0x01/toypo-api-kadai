@@ -16,11 +16,13 @@ ActiveRecord::Schema.define(version: 2021_10_17_145827) do
   enable_extension "plpgsql"
 
   create_table "connections", force: :cascade do |t|
-    t.integer "user_id", null: false
-    t.integer "store_id", null: false
+    t.bigint "user_id", null: false
+    t.bigint "store_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["store_id"], name: "index_connections_on_store_id"
     t.index ["user_id", "store_id"], name: "index_connections_on_user_id_and_store_id", unique: true
+    t.index ["user_id"], name: "index_connections_on_user_id"
   end
 
   create_table "coupon_contents", force: :cascade do |t|
@@ -38,10 +40,12 @@ ActiveRecord::Schema.define(version: 2021_10_17_145827) do
   create_table "coupons", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "coupon_content_id", null: false
+    t.bigint "stampcard_id", null: false
     t.datetime "expiration_date", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["coupon_content_id"], name: "index_coupons_on_coupon_content_id"
+    t.index ["stampcard_id"], name: "index_coupons_on_stampcard_id"
     t.index ["user_id"], name: "index_coupons_on_user_id"
   end
 
@@ -108,6 +112,7 @@ ActiveRecord::Schema.define(version: 2021_10_17_145827) do
   add_foreign_key "coupon_contents", "stampcard_contents"
   add_foreign_key "coupon_contents", "stores"
   add_foreign_key "coupons", "coupon_contents"
+  add_foreign_key "coupons", "stampcards"
   add_foreign_key "coupons", "users"
   add_foreign_key "stampcard_contents", "stores"
   add_foreign_key "stampcards", "stampcard_contents"

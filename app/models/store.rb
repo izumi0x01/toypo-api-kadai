@@ -4,6 +4,7 @@ class Store < ActiveRecord::Base
 
   #connectionの関連付け
   has_many :connections, dependent: :destroy
+  has_many :users, through: :connections
 
   #stampcard_contentの関連付け
   has_one :stampcard_content, dependent: :destroy

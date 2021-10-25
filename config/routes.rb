@@ -1,8 +1,33 @@
 Rails.application.routes.draw do
-  get 'static_pages/home'
-  get 'static_pages/help'
-  # # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+
+  namespace :api do
+    namespace :v1 do
+      
+      # get 'store/index_connections' => 'store/stores#index_connections'
+      # get 'user/index_connections' => 'user/users#index_connections'
+      
+      mount_devise_token_auth_for 'Store', at: 'store', controllers: {
+        registrations: 'api/v1/store/registrations'
+      }
+      
+      mount_devise_token_auth_for 'User', at: 'user', controllers: {
+        registrations: 'api/v1/user/registrations'
+      }
+
+      namespace :user do
+        resources :connections, only: [:create, :destroy, :show, :index]
+        resources :stampcards
+        resources :coupons
+      end
+
+      namespace :store do
+        resources :connections, only: [:create, :destroy, :show, :index]
+        resource :stampcard_contents
+        resources :coupon_contents
+      end
 
 
+    end
+  end
   
 end

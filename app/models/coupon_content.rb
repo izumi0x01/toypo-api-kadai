@@ -4,7 +4,7 @@ class CouponContent < ApplicationRecord
         belongs_to :store
 
         #couponとの関連付け
-        has_many :coupons, dependent: :destroy
+        has_many :coupons
 
         #storeとの関連付け
         belongs_to :stampcard_content

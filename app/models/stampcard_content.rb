@@ -4,10 +4,10 @@ class StampcardContent < ActiveRecord::Base
     belongs_to :store
 
     #stampcardとの関連付け
-    has_many :stampcards, dependent: :destroy
+    has_many :stampcards,  dependent: :destroy
 
     #coupon_contentとの関連付け
-    has_many :coupon_contents, dependent: :destroy
+    has_many :coupon_contents
 
 
     

@@ -13,8 +13,8 @@ class Api::V1::User::StampcardsController < ApplicationController
         extract_stampcards.each do |extract_stampcard|
 
             #スタンプが上限数を超えていないかの確認
-            if extract_stampcards.stamp_count >= extract_stampcards.stampcard_content.max_stamp_count
-                extract_stampcards.stamp_count = extract_stampcards.stampcard_content.max_stamp_count
+            if extract_stampcard.stamp_count >= extract_stampcard.stampcard_content.max_stamp_count
+                extract_stampcard.stamp_count = extract_stampcard.stampcard_content.max_stamp_count
             end
 
             stampcards.append(extract_stampcard)
@@ -41,8 +41,8 @@ class Api::V1::User::StampcardsController < ApplicationController
         end
 
         #繋がっている店舗が発行しているスタンプカードかどうかの確認
-        if connected_stampcard.present?
-            render json: connected_stampcard, status: :ok and return
+        if extract_stampcard.present?
+            render json: extract_stampcard, status: :ok and return
         else
             render json: {error: "record was not found"}, status: :not_found and return
         end

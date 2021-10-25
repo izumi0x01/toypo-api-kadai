@@ -7,6 +7,6 @@ class Stampcard < ApplicationRecord
     belongs_to :stampcard_content
 
     #couponとの関連付け
-    has_many :coupons
+    has_many :coupons,  dependent: :destroy
 
 end
